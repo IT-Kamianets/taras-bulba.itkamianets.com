@@ -23,6 +23,11 @@ export default function Navbar() {
   useEffect(() => {
     const sectionIds = ["about", "amenities", "rooms", "restaurant", "gallery", "reviews", "location", "footer"];
     const handleScroll = () => {
+      const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+      if (atBottom) {
+        setActiveSection("#footer");
+        return;
+      }
       const scrollY = window.scrollY + window.innerHeight / 3;
       let current = "";
       for (const id of sectionIds) {
@@ -50,6 +55,10 @@ export default function Navbar() {
       document.body.style.overflow = "";
     }
     return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("mobile-menu-toggle", { detail: { open: mobileOpen } }));
   }, [mobileOpen]);
 
   return (

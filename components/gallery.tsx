@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
@@ -47,6 +47,10 @@ export default function Gallery() {
   const [slideDir, setSlideDir] = useState<"left" | "right">("right");
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
+  /* Touch / swipe refs */
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+
   const goTo = useCallback(
     (p: number, dir?: "left" | "right") => {
       let next = p;
@@ -83,7 +87,46 @@ export default function Gallery() {
   };
 
   const lightboxNext = () => {
-    if (lightboxIdx !== null && lightboxIdx < galleryImages.length - 1) setLightboxIdx(lightboxIdx + 1);
+    if (lightboxIdx !== null && lightboxIdx < galleryImages.length - 1)
+      setLightboxIdx(lightboxIdx + 1);
+  };
+
+  /* ---- Swipe: gallery grid ---- */
+  const handleGridTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchEndX.current = null;
+  };
+  const handleGridTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+  const handleGridTouchEnd = () => {
+    if (touchStartX.current === null || touchEndX.current === null) return;
+    const dist = touchStartX.current - touchEndX.current;
+    if (Math.abs(dist) > 50) {
+      if (dist > 0) goTo(page + 1, "right");
+      else goTo(page - 1, "left");
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
+  /* ---- Swipe: lightbox ---- */
+  const handleLbTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchEndX.current = null;
+  };
+  const handleLbTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+  const handleLbTouchEnd = () => {
+    if (touchStartX.current === null || touchEndX.current === null) return;
+    const dist = touchStartX.current - touchEndX.current;
+    if (Math.abs(dist) > 50) {
+      if (dist > 0) lightboxNext();
+      else lightboxPrev();
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
   };
 
   return (
@@ -98,8 +141,13 @@ export default function Gallery() {
           </h2>
         </div>
 
-        {/* Gallery grid */}
-        <div className="mt-12">
+        {/* Gallery grid — swipeable on touch */}
+        <div
+          className="mt-12 touch-pan-y"
+          onTouchStart={handleGridTouchStart}
+          onTouchMove={handleGridTouchMove}
+          onTouchEnd={handleGridTouchEnd}
+        >
           <div
             className={`grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5 md:gap-3 transition-all duration-300 ease-in-out ${
               animating
@@ -124,8 +172,18 @@ export default function Gallery() {
                       className="h-full w-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:brightness-110"
                     />
                     <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-primary/0 transition-all duration-500 group-hover:bg-primary/20">
-                      <svg className="h-8 w-8 text-primary-foreground opacity-0 transition-opacity duration-300 group-hover:opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                      <svg
+                        className="h-8 w-8 text-primary-foreground opacity-0 transition-opacity duration-300 group-hover:opacity-80"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"
+                        />
                       </svg>
                     </div>
                   </div>
@@ -135,7 +193,7 @@ export default function Gallery() {
           </div>
         </div>
 
-        {/* Navigation: arrows + dots in one row */}
+        {/* Navigation: arrows + dots */}
         <div className="mt-6 flex items-center justify-center gap-3">
           <button
             onClick={() => goTo(page - 1, "left")}
@@ -172,46 +230,85 @@ export default function Gallery() {
         </div>
       </div>
 
-      {/* Lightbox */}
+      {/* ===== Lightbox ===== */}
       {lightboxIdx !== null && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm"
           onClick={closeLightbox}
         >
+          {/* Close */}
           <button
             onClick={closeLightbox}
-            className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+            className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 cursor-pointer"
             aria-label="Закрити"
           >
             <X className="h-6 w-6" />
           </button>
 
+          {/* Desktop side arrows */}
           <button
-            onClick={(e) => { e.stopPropagation(); lightboxPrev(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              lightboxPrev();
+            }}
             disabled={lightboxIdx === 0}
-            className="absolute left-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 disabled:opacity-20 md:left-6 md:h-12 md:w-12"
+            className="absolute left-6 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 disabled:opacity-20 disabled:cursor-not-allowed md:flex md:h-12 md:w-12 cursor-pointer"
             aria-label="Попереднє фото"
           >
             <ChevronLeft className="h-6 w-6" />
           </button>
 
           <button
-            onClick={(e) => { e.stopPropagation(); lightboxNext(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              lightboxNext();
+            }}
             disabled={lightboxIdx === galleryImages.length - 1}
-            className="absolute right-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 disabled:opacity-20 md:right-6 md:h-12 md:w-12"
+            className="absolute right-6 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 disabled:opacity-20 disabled:cursor-not-allowed md:flex md:h-12 md:w-12 cursor-pointer"
             aria-label="Наступне фото"
           >
             <ChevronRight className="h-6 w-6" />
           </button>
 
+          {/* Image — swipeable on touch */}
           <img
             src={galleryImages[lightboxIdx]}
             alt={`Фото ${lightboxIdx + 1}`}
             onClick={(e) => e.stopPropagation()}
-            className="max-h-[85vh] max-w-[90vw] object-contain"
+            onTouchStart={handleLbTouchStart}
+            onTouchMove={handleLbTouchMove}
+            onTouchEnd={handleLbTouchEnd}
+            className="max-h-[70vh] max-w-[90vw] select-none object-contain touch-none md:max-h-[85vh]"
           />
 
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-4 py-1.5 text-sm text-white backdrop-blur-sm">
+          {/* Mobile bottom controls: ← counter → */}
+          <div
+            className="mt-4 flex items-center gap-6 md:hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={lightboxPrev}
+              disabled={lightboxIdx === 0}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+              aria-label="Попереднє фото"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <span className="min-w-[60px] text-center text-sm text-white">
+              {lightboxIdx + 1} / {galleryImages.length}
+            </span>
+            <button
+              onClick={lightboxNext}
+              disabled={lightboxIdx === galleryImages.length - 1}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+              aria-label="Наступне фото"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Desktop counter */}
+          <div className="absolute bottom-4 left-1/2 hidden -translate-x-1/2 rounded-full bg-white/10 px-4 py-1.5 text-sm text-white backdrop-blur-sm md:block">
             {lightboxIdx + 1} / {galleryImages.length}
           </div>
         </div>

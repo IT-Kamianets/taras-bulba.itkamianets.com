@@ -15,7 +15,7 @@ export const LOCALES: { code: Locale; label: string }[] = [
 export const BOOKING_URL =
   "https://www.agoda.com/ru-ru/taras-bulba/hotel/all/kamenets-podolskiy-ua.html?countryId=79&finalPriceView=1&isShowMobileAppPrice=false&cid=1934116&numberOfBedrooms=&familyMode=false&adults=2&children=0&rooms=1&maxRooms=0&checkIn=2026-03-31&isCalendarCallout=false&childAges=&numberOfGuest=0&missingChildAges=false&travellerType=1&showReviewSubmissionEntry=false&currencyCode=UAH&isFreeOccSearch=false&tag=J2CHYWM7KFTMGXYK&los=1&searchrequestid=03e2977a-d978-424e-a097-4547873a402f&ds=W4Zs9ztR2EUe5LvY";
 
-export const MENU_URL = "https://taras-bulba.choiceqr.com/menu";
+export const MENU_URL = "https://taras-bulba.choiceqr.com/menu/section:menyu/menyu-neskorenih";
 
 const ROOM_IMAGES = [
   ["/logo/Apartments1.jpg", "/logo/Apartments2.jpg", "/logo/Apartments3jpg.jpg", "/logo/Apartments4.jpg"],
@@ -226,7 +226,7 @@ const translations: Record<Locale, Translations> = {
     reviews: {
       subtitle: "\u0412\u0406\u0414\u0413\u0423\u041a\u0418",
       title: "\u0429\u041e \u041a\u0410\u0416\u0423\u0422\u042c \u041d\u0410\u0428\u0406 \u0413\u041e\u0421\u0422\u0406",
-      ratingLabel: "Exceptional",
+      ratingLabel: "\u0412\u0438\u043d\u044f\u0442\u043a\u043e\u0432\u0438\u0439",
       ratingValue: "9.5",
       testimonials: [
         { name: "\u041e\u043b\u044c\u0433\u0430", text: "\u0413\u0430\u0440\u043d\u0430 \u043b\u043e\u043a\u0430\u0446\u0456\u044f, \u0447\u0438\u0441\u0442\u043e, \u0442\u0435\u0440\u0438\u0442\u043e\u0440\u0456\u044f \u0434\u043e\u0433\u043b\u044f\u043d\u0443\u0442\u0430 \u0439 \u0430\u043a\u0443\u0440\u0430\u0442\u043d\u0430, \u0430\u0434\u043c\u0456\u043d\u0456\u0441\u0442\u0440\u0430\u0446\u0456\u044f \u043f\u0440\u0438\u0432\u0456\u0442\u043d\u0430 \u0442\u0430 \u0443\u0432\u0430\u0436\u043d\u0430.", rating: 10 },

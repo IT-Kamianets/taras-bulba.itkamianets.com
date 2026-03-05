@@ -106,22 +106,22 @@
     width: 10px;
   }
   ::-webkit-scrollbar-track {
-    background: transparent;
+    background: oklch(0.22 0.01 60);
   }
   ::-webkit-scrollbar-thumb {
-    background: oklch(0.55 0.08 65);
+    background: var(--accent);
     border-radius: 9999px;
     border: 3px solid transparent;
     background-clip: padding-box;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: oklch(0.45 0.08 65);
+    background: oklch(0.55 0.10 65);
     border: 3px solid transparent;
     background-clip: padding-box;
   }
   @supports not selector(::-webkit-scrollbar) {
     html {
-      scrollbar-color: oklch(0.55 0.08 65) transparent;
+      scrollbar-color: var(--accent) oklch(0.22 0.01 60);
       scrollbar-width: thin;
     }
   }

@@ -30,16 +30,18 @@ export default function About() {
           </div>
 
           {/* Images - 2x2 grid */}
-          <div className="grid grid-cols-2 gap-3">
-            {aboutImages.map((src, idx) => (
-              <div key={idx} className="group overflow-hidden rounded-lg">
-                <img
-                  src={src}
-                  alt={`Готель Тарас Бульба ${idx + 1}`}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-              </div>
-            ))}
+          <div className="lg:relative">
+            <div className="grid grid-cols-2 gap-3 lg:absolute lg:inset-0">
+              {aboutImages.map((src, idx) => (
+                <div key={idx} className="group overflow-hidden rounded-lg">
+                  <img
+                    src={src}
+                    alt={`Готель Тарас Бульба ${idx + 1}`}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

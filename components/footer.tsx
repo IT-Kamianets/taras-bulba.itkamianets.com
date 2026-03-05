@@ -54,7 +54,7 @@ export default function Footer() {
             <h4 className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/40">
               {t.footer.navHeading}
             </h4>
-            <div className="mt-4 grid grid-cols-2 gap-x-10 gap-y-2.5">
+            <div className="mt-4 grid grid-flow-col grid-rows-4 gap-x-10 gap-y-2.5">
               {navLeft.map((item) => (
                 <a
                   key={item.label}
